@@ -18,7 +18,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
      * @var array
      */
     protected $fillable = [
-        'first_name', 'last_name', 'email', 'password',
+        'first_name', 'last_name', 'email', 'password', 'confirmation_token'
     ];
 
     /**
