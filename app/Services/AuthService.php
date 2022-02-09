@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\ForgotPassword;
 use App\Events\UserRegistered;
 use App\Exceptions\LoginInvalidException;
 use App\Exceptions\UserHasBeenTakenException;
@@ -82,11 +83,14 @@ class AuthService
     public function forgotPassword(string $email)
     {
         $user = User::where('email', $email)->firstOrFail();
+        $token = Str::random(45);
 
         PasswordReset::create([
             'email' => $user->email,
-            'token' => Str::random(45),
+            'token' => $token,
             'created_at' => now(),
         ]);
+
+        event(new ForgotPassword($user, $token));
     }
 }
