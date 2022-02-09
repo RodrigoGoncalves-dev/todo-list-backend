@@ -5,10 +5,12 @@ namespace App\Services;
 use App\Events\ForgotPassword;
 use App\Events\UserRegistered;
 use App\Exceptions\LoginInvalidException;
+use App\Exceptions\ResetPasswordTokenInvalidException;
 use App\Exceptions\UserHasBeenTakenException;
 use App\Exceptions\VerifyEmailTokenInvalidException;
 use App\PasswordReset;
 use App\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Str;
 
 class AuthService
@@ -92,5 +94,25 @@ class AuthService
         ]);
 
         event(new ForgotPassword($user, $token));
+    }
+
+
+    /**
+     * @throws ResetPasswordTokenInvalidException
+     */
+    public function resetPassword(string $email, string $password, string $token)
+    {
+        $passwordReset = PasswordReset::where('email', $email)->where('token', $token)->first();
+        if(empty($passwordReset)) {
+            throw new ResetPasswordTokenInvalidException();
+        }
+
+        $user = User::where('email', $email)->firstOrFail();
+        $user->password = bcrypt($password);
+        $user->save();
+
+        PasswordReset::where('email', $email)->delete();
+
+        return '';
     }
 }
