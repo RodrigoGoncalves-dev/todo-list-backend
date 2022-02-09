@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\LoginInvalidException;
 use App\Exceptions\UserHasBeenTakenException;
+use App\Http\Requests\AuthForgotPasswordResquest;
 use App\Http\Requests\AuthLoginRequest;
 use App\Http\Requests\AuthRegisterRequest;
 use App\Http\Requests\AuthVerifyEmailRequest;
 use App\Http\Resources\UserResource;
 use App\Services\AuthService;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -49,5 +51,11 @@ class AuthController extends Controller
         $user = $this->authService->verifyEmail($input['token']);
 
         return new UserResource($user);
+    }
+
+    public function forgotPassword(AuthForgotPasswordResquest $request)
+    {
+        $input = $request->validated();
+        return $this->authService->forgotPassword($input['email']);
     }
 }
